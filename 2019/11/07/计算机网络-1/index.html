@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="renderer" content="webkit">
+
+  
+  <title>计算机网络(1) | 孙建树的技术博客</title>
+
+  <link rel="shortcut icon" href="/images/favicon.jpg">
+  <link rel="alternate" href="/atom.xml" title="孙建树的技术博客">
+  <meta name="description" content="OSI与TCP&#x2F;IP各层的结构与功能，都有哪些协议OSI开放式互联参考模型当前市面上存在四层、五层、七层协议，而ISO国际标准化组织提出来的OSI七层协议模型是业界提出的概念性框架      1. 物理层首先要解决两台物理机之间的通信需求，具体就是机器A往机器B发送比特流，机器B能收到这些比特流，这便是物理层要做的事情。主要定义物理设备的标准，如网线的类型，光纤的接口类型，各种传输介质的传输速率等">
+<meta name="keywords" content="计算机网络相关,网络基础">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络(1)">
+<meta property="og:url" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;2019&#x2F;11&#x2F;07&#x2F;%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1&#x2F;index.html">
+<meta property="og:site_name" content="孙建树的技术博客">
+<meta property="og:description" content="OSI与TCP&#x2F;IP各层的结构与功能，都有哪些协议OSI开放式互联参考模型当前市面上存在四层、五层、七层协议，而ISO国际标准化组织提出来的OSI七层协议模型是业界提出的概念性框架      1. 物理层首先要解决两台物理机之间的通信需求，具体就是机器A往机器B发送比特流，机器B能收到这些比特流，这便是物理层要做的事情。主要定义物理设备的标准，如网线的类型，光纤的接口类型，各种传输介质的传输速率等">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;微信截图_20191107214712.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;微信截图_20191107211332.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;微信截图_20191107214215.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;微信截图_20191107214609.png">
+<meta property="og:updated_time" content="2019-11-07T14:01:27.619Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;微信截图_20191107214712.png">
+
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="theme-color" content="#9C27B0">
+  <meta name="description" content="">
+  <meta name="keywords" content=",计算机网络相关,网络基础">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="孙建树的技术博客">
+  <meta name="msapplication-starturl" content="http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/">
+  <meta name="msapplication-navbutton-color" content="#9C27B0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="孙建树的技术博客">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="/images/favicon.jpg">
+
+  
+    <meta property="article:published_time" content="Thu Nov 07 2019 21:25:54 GMT+0800">
+    <meta property="article:modified_time" content="Thu Nov 07 2019 22:01:27 GMT+0800">
+  
+
+  
+    <link rel="canonical" href="http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/">
+  
+
+  <meta name="google-site-verification" content="fXjtlIfaDc_X-0P11rO3bEp1Nk4IKXphoJv0GqGZCco">
+  <meta name="baidu-site-verification" content="I3t1wfwZvd">
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create','UA-139531378-1','auto');ga('send','pageview');
+</script>
+  <script>
+  var _hmt = _hmt || [];
+  (function() {var hm = document.createElement('script');
+  hm.src = 'https://hm.baidu.com/hm.js?1054d51c0b66f1d168829173682c8159';
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+
+  <link rel="stylesheet" href="/css/mdui.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="mdui-appbar-with-toolbar mdui-drawer-body-left mdui-theme-primary-indigo mdui-theme-accent-pink">
+  <script>var a=localStorage.getItem("mdui-theme-layout-dark");if(a){document.getElementsByTagName("body")[0].className+=" mdui-theme-layout-dark"};</script>
+  <header id="header" class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide mdui-appbar-inset">
+  <div class="mdui-toolbar mdui-color-theme">
+    <a href="javascript:;" target="_blank" rel="noopener" class="mdui-btn mdui-btn-icon" mdui-drawer="{target: '#sidebar', swipe: true}"><i class="mdui-icon material-icons">menu</i></a>
+    <a href="/" class="mdui-typo-headline">孙建树的技术博客</a>
+    <div class="mdui-toolbar-spacer"></div>
+    <a href="javascript:;" target="_blank" rel="noopener" class="mdui-btn mdui-btn-icon" mdui-dialog="{target: '#search'}" mdui-tooltip="{content: '搜索'}"><i class="mdui-icon material-icons">search</i></a>
+    <a href="/atom.xml" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'RSS'}"><i class="mdui-icon material-icons">rss_feed</i></a>
+  </div>
+</header>
+<div class="mdui-dialog" id="search">
+  
+    <div class="search-form">
+      <input type="search" class="search-form-input" placeholder="请输入关键字">
+    </div>
+    <div class="search-result" data-resource="/search.xml"></div>
+  
+</div>
+  <aside id="sidebar" class="mdui-drawer mdui-drawer-full-height">
+  <div class="mdui-grid-tile">
+    <img src="/images/banner.jpg" style="height: 160px;">
+    <img src="/images/avatar.jpg" class="avatar-animation" style="position: absolute; top: 10%; left: 24px; width: 64px; height: 64px; border: 2px solid #fff; border-radius: 50%;">
+    <div class="mdui-grid-tile-actions">
+      <div class="mdui-grid-tile-text">
+        <div class="mdui-grid-tile-title">孙建树</div>
+        <div class="mdui-grid-tile-subtitle"><i class="mdui-icon material-icons">art_track</i>桃李不言，下自成蹊</div>
+      </div>
+      
+        <div class="mdui-grid-tile-buttons">
+          <a href="mailto:sjswhut@163.com" target="_blank" rel="noopener" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'sjswhut@163.com'}"><i class="mdui-icon material-icons">email</i></a>
+        </div>
+      
+    </div>
+  </div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    <a href="/" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-blue">home</i>
+      <div class="mdui-list-item-content">主页</div>
+    </a>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-deep-orange">inbox</i>
+        <div class="mdui-list-item-content">归档</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-green">chrome_reader_mode</i>
+        <div class="mdui-list-item-content">分类</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/categories/tomcat%E7%B1%BB/">tomcat类<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/">默认分类<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-brown">bookmark</i>
+        <div class="mdui-list-item-content">标签</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/tags/nginx/" rel="tag">nginx<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/spring/" rel="tag">spring<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springMVC/" rel="tag">springMVC<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/tomcat/" rel="tag">tomcat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/zookeeper/" rel="tag">zookeeper<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" rel="tag">网络基础<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3/" rel="tag">计算机网络相关<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <a href="/about" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-purple">person</i>
+      <div class="mdui-list-item-content">关于</div>
+    </a>
+  </div>
+
+  <div class="mdui-divider"></div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    
+      <a href="/tagcloud" class="mdui-list-item mdui-ripple">标签云</a>
+    
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <div class="mdui-list-item-content">友情链接</div>
+        <i class="mdui-list-item-icon mdui-icon material-icons">link</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+          <a href="https://github.com" target="_blank" class="mdui-list-item mdui-ripple mdui-p-l-2 mdui-text-color-theme-accent" style="justify-content: center;">Github</a>
+        
+        
+      </div>
+    </div>
+  </div>
+</aside>
+  <main id="main" class="mdui-m-t-5 fadeIn animated">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.css">
+  <style>#main article .mdui-card-content .center-block{display:block!important;margin-right:auto!important;margin-left:auto!important}</style>
+  <article class="mdui-card mdui-m-b-5">
+    <header class="mdui-card-media">
+      <img src="/images/random/material-16.png" style="max-height: 240px;">
+      <div class="mdui-card-media-covered">
+        <div class="mdui-card-primary">
+          <div class="mdui-card-primary-title">计算机网络(1)</div>
+          <div class="mdui-card-primary-subtitle"><i class="iconfont">&#xe697;</i> 2019-11-07 / <i class="iconfont">&#xe601;</i> 孙建树</div>
+        </div>
+      </div>
+      <div class="mdui-card-menu">
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#qrcode', align: 'right'}"><i class="mdui-icon material-icons">devices</i></button>
+          <ul class="mdui-menu" id="qrcode">
+            
+              <li class="mdui-menu-item"><a class="mdui-text-center mdui-ripple">发送到手机</a></li>
+            
+            <li class="mdui-menu-item" disabled>
+              
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQ4AAAEOCAAAAABd2qZ5AAADkElEQVR42u3aS44iQQwFQO5/6ZntSK0p3rMzES1FrVpNkYWDhfHn9cf1z/VCgAMHDhw4cODAgQPHF3O84it5189X773r+YQiFhw4cODAcYHjTSqK72lB/3dCcufz33ksOHDgwIHjHsdzAss/4nOQG7IcrogFBw4cOHB8GUcbWPvEtoTDgQMHDhy/kSMvxpKW3/OZsxIOBw4cOHB8A0cS8KypdyqFt23E671SHDhw4MCxXmj4/r8/ut+BAwcOHDh+cOyvJPXO0md+zurz48CBAweOoxx5ETULLG8sJknx+SdCXsjhwIEDB47bHPmhbSmVnDa7M39uPXbCgQMHDhyHOFaHrgObFYFJAn7zLBw4cODAcZQjX1xok267rJAPitq1Bhw4cODA8XmOs+OfnPI5pLbh2BZ4OHDgwIHjBsem0ErKuX06nKXwY1M4HDhw4MCxmOAnIW1ah21jccaaj8dw4MCBA8cNjqRtNwtjFvD+/nzghAMHDhw4bnC8LlxF+TRq57Vjpzf/x4EDBw4cH+FIHp+Mo/YNxHY9om1B4sCBAweOsxxt6ZWUefWyWpxciyDzQhQHDhw4cBzlmCXLU2sQbVNyhrVaaMCBAwcOHCOO2UJAksbaJmDyrLZge1Oa4sCBAweOCxyb0qtdjGsTc4teI+LAgQMHjgsc7WCpHUHtVxDacVexGIEDBw4cOC5wtOsFeZLekLXrDslXNdzvwIEDBw4cMUfesMsbfzOszf/zxIwDBw4cOG5z7IPMk1wCnaThYqSUtBRx4MCBA8cFjk3ZNmsLzhYaZqOvN0sPOHDgwIHjMke7LtAuq80aeRuyN3A4cODAgeMyx6xY2pdVOUT7lTxfOHDgwIHjLEcyglqlsSD1bhL/rJWJAwcOHDjucZxdiWvfu0/k+aCraA7iwIEDB44FR54496G26bwNO/9BgAMHDhw47nHkywptCbcfZbVfRjviwoEDBw4cNzjaqx0LJYG1hVySVpPSFAcOHDhw3OAYJqejabVda8jXIw7sd+DAgQMHjhFHnszyZlweUh5Ye1q0WocDBw4cOK5xFEfEHytnnSXO9sdBkWhx4MCBA8dHONqFufbMduyUvHpsoQEHDhw4cFyuWfL7k4S6ScOrBIwDBw4cOK5xnFoayIPfLMblCXhYwuHAgQMHjgXHrPTKVw1mKXZT+BXJGwcOHDhwHOVw4cCBAwcOHDhw4MCB48uuvx43TW4bzOpJAAAAAElFTkSuQmCC">
+              
+            </li>
+          </ul>
+        
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#share_menu', align: 'right'}"><i class="mdui-icon material-icons">share</i></button>
+          <ul class="mdui-menu" id="share_menu">
+            <li class="mdui-menu-item">
+              <a href="http://service.weibo.com/share/share.php?appkey=&title=计算机网络(1)&url=http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/&pic=http://athenasjs.github.io/images/favicon.jpg&searchPic=false&style=simple" target="_blank" class="mdui-ripple">分享到微博</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://twitter.com/intent/tweet?text=计算机网络(1)&url=http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/&via=孙建树" target="_blank" class="mdui-ripple">分享到Twitter</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/" target="_blank" class="mdui-ripple">分享到Facebook</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://plus.google.com/share?url=http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/" target="_blank" class="mdui-ripple">分享到Google+</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/&title=计算机网络(1)" target="_blank" class="mdui-ripple">分享到LinkedIn</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="http://connect.qq.com/widget/shareqq/index.html?site=孙建树的技术博客&title=计算机网络(1)&summary=&pics=http://athenasjs.github.io/images/favicon.jpg&url=http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/" target="_blank" class="mdui-ripple">分享到QQ</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://telegram.me/share/url?url=http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/&text=计算机网络(1)" target="_blank" class="mdui-ripple">分享到Telegram</a>
+            </li>
+          </ul>
+        
+      </div>
+    </header>
+    <div class="mdui-card-content mdui-typo">
+      <h2 id="OSI与TCP-IP各层的结构与功能，都有哪些协议"><a href="#OSI与TCP-IP各层的结构与功能，都有哪些协议" class="headerlink" title="OSI与TCP/IP各层的结构与功能，都有哪些协议"></a>OSI与TCP/IP各层的结构与功能，都有哪些协议</h2><h3 id="OSI开放式互联参考模型"><a href="#OSI开放式互联参考模型" class="headerlink" title="OSI开放式互联参考模型"></a><strong>OSI开放式互联参考模型</strong></h3><p>当前市面上存在四层、五层、七层协议，而ISO国际标准化组织提出来的OSI七层协议模型是业界提出的概念性框架</p>
+<center> <img src="/images/微信截图_20191107214712.png" width = 60% height = 60% /></center>  
+
+<h3 id="1-物理层"><a href="#1-物理层" class="headerlink" title="1. 物理层"></a>1. 物理层</h3><p>首先要解决两台物理机之间的通信需求，具体就是机器A往机器B发送比特流，机器B能收到这些比特流，这便是物理层要做的事情。主要定义物理设备的标准，如网线的类型，光纤的接口类型，各种传输介质的传输速率等。主要作用是传输比特流，0-1比特流转化为电流强弱来传输，到达目的后再转化为0-1机器码，也就是数模转换、 模数转换，网卡工作在这一层。</p>
+<h3 id="2-数据链路层"><a href="#2-数据链路层" class="headerlink" title="2. 数据链路层"></a>2. 数据链路层</h3><p>在传输比特流的过程中会产生错传、传输不完整的可能，因此数据链路层应运而生，定义了如何格式化数据以及控制对物理介质的访问，这一层通常还提供错误检测和纠正，以确保数据传输的可靠性。本层将网络层交下来的IP数据报组装成帧，在两个相邻节点的链路上传送帧。交换机工作在这一层，对帧解码，并根据帧中包含的信息把帧送到正确的接收方。</p>
+<h3 id="3-网络层"><a href="#3-网络层" class="headerlink" title="3. 网络层"></a>3. 网络层</h3><p>随着网络节点的增加，点对点通信时候需要经过多个节点，如何找到目标节点，如果选择最优路径便成为首要需求。此时便有了网络层，主要功能是把网络地址翻译成对应的物理地址，并决定如何将数据从发送方路由到接收方，网络层通过综合考虑发送优先权、网络拥塞程度、服务质量以及可选路由的花费来决定从一个网络中节点A到另一个网络中节点B的最佳路径。路由器属于网络层，连接网络各段。此层的数据成为数据包，本层需要关注的是TCP/IP协议中的IP协议。</p>
+<h3 id="4-传输层"><a href="#4-传输层" class="headerlink" title="4. 传输层"></a>4. 传输层</h3><p>随着网络通信需求的进一步扩大，通信过程中需要传输大量数据如海量文件传输等，可能需要很长时间，网络可能中断很多次，此时为了保证数据正确性，需要对发出去的数据进行切分，分割为一个一个的段落segment，那么其中一个段落丢失了怎么办，要不要重传，每个段落要按照顺序到达么，这个便是传输层需要考虑的问题。负责主机之间的数据传输，解决传输质量的问题，传输协议同时进行流量控制，或者根据接收方接收数据的快慢程度规定适当的发送速率，除此之外，传输层按照网络能处理的最大尺寸，将较长的数据包进行强制分割，（数据片序列号 排序） TCP/UDP协议</p>
+<h3 id="5-会话层"><a href="#5-会话层" class="headerlink" title="5. 会话层"></a>5. 会话层</h3><p>经过下面四层，数据已经可以正确发送到另外一台记起了，但是不能让用户每一次都用TCP打包数据，然后用IP寻址，需要建立自动收发包和寻址的机制。会话层负责不同机器上的用户之间建立及管理会话。</p>
+<h3 id="6-表示层"><a href="#6-表示层" class="headerlink" title="6. 表示层"></a>6. 表示层</h3><p>如果要用linux给windows发包，两个系统语法不一致，于是需要表示层帮我们解决不同通信系统之间的语法问题，负责信息的语法语意以及它们的关联，如加密解密、转换翻译、压缩解压缩。</p>
+<h3 id="7-应用层"><a href="#7-应用层" class="headerlink" title="7. 应用层"></a>7. 应用层</h3><p>规定发送方和接收方必须使用一个固定长度的消息头，消息头必须使用某种固定的组成，消息头里必须记录消息的长度等一系列信息，以方便接收方能正确解析发送方的数据，旨在更方便的利用从网络中接收到的数据。至于数据的传递，没有该层也可以用TCP实现，不过传来传去都是一些01的字节数组而已。该层需要关注的是与之相对应的TCP/IP协议中的HTTP协议</p>
+<h3 id="数据的解析过程"><a href="#数据的解析过程" class="headerlink" title="数据的解析过程"></a>数据的解析过程</h3><p>从应用层开始，都会对要传输的数据头部进行处理，先自上而下，后自下而上处理数据头部，加上本层的一些信息，最终由物理层将数据解析成比特流在网络中传输，数据传递到目标地址，自底而上将先前加上的头部给解析分离出来。</p>
+<center> <img src="/images/微信截图_20191107211332.png" width = 60% height = 60% /></center>  
+
+
+<h3 id="TCP-IP"><a href="#TCP-IP" class="headerlink" title="TCP/IP"></a>TCP/IP</h3><p>OSI参考模型定义了开放系统的层次结构，层次之间的相互关系以及各层所包括的可能的任务，作为一个理论框架协调各层所提供的服务，但是并没有提供一个可实现的方法，而是描述了一些概念，即OSI参考模型并不是标准，而是在制定标准时使用的一个概念型框架，事实上的标准是TCP/IP四层架构参考模型，可以理解成是OSI的一种实现。OSI模型注重通信协议必要的功能是什么，而TCP/IP更强调在计算机上实现协议应该开发哪种程序。</p>
+<center> <img src="/images/微信截图_20191107214215.png" width = 60% height = 60% /></center>  
+
+
+<p>TCP/IP泛指网际协议群，HTTP\Telnet等等都是属于该协议群，是互联网的重要组成部分。在数据传输的过程中，和OSI模型一样，TCP/IP的每一层都会对数据附加一个头部，在这个首部中包含了该层必要的信息，如发送的目标地址以及协议等，数据发送到目标地址之后再层层解套出来。</p>
+<center> <img src="/images/微信截图_20191107214609.png" width = 60% height = 60% /></center>  
+
+      <blockquote class="mdui-m-t-5">
+        
+          <strong>本文遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</strong><br>
+        
+        <strong>本文链接：</strong><a href="http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/">http://athenasjs.github.io/2019/11/07/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-1/</a>
+      </blockquote>
+      
+    </div>
+    <footer class="mdui-card-actions">
+      
+        <a class="mdui-ripple article_categories-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+      
+      
+        <a class="mdui-ripple article_tags-link" href="/tags/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" rel="tag">网络基础</a><a class="mdui-ripple article_tags-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3/" rel="tag">计算机网络相关</a>
+      
+    </footer>
+    
+  </article>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+  <script>$("#main article .mdui-card-content img.fancybox").on("click",function(e){$.fancybox.open({src:$(this).attr("src")});});</script>
+
+
+  <nav id="paginator">
+    
+    <div class="spacer"></div>
+    
+      <a rel="next" class="extend next" href="/2019/11/05/my-second-blog/">
+        下一篇&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button aria-label="next" class="mdui-btn mdui-btn-raised mdui-btn-dense mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_forward</i></button>
+      </a>
+    
+  </nav>
+
+
+
+</main>
+  <footer id="footer" class="mdui-m-t-5 mdui-p-y-3 mdui-color-theme">
+  <div class="mdui-p-y-0 mdui-text-center">
+    
+    
+    
+    
+    
+    
+    
+      <a href="https://github.com/athenasjs" target="_blank"><i class="mdui-p-a-1 mdui-icon iconfont mdui-text-color-theme-a100">&#xe7ab;</i></a>
+    
+    
+    
+      <a href="https://www.zhihu.com/people/sun-jian-shu-24/activities" target="_blank"><i class="mdui-p-a-1 mdui-icon iconfont mdui-text-color-theme-a100">&#xe6c0;</i></a>
+    
+    
+    
+    
+  </div>
+  <div class="mdui-p-y-1 mdui-text-center">
+    Copyright &copy; 2019 - 2019 孙建树<br>
+    Powered by <a href="https://hexo.io/" target="_blank" class="mdui-text-color-theme-accent">Hexo</a>
+    
+  </div>
+</footer>
+  <button id="gotop" class="mdui-fab mdui-fab-fixed mdui-fab-hide mdui-ripple mdui-color-theme-accent"><i class="mdui-icon material-icons">arrow_upward</i></button>
+  
+  <script src="/js/mdui.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>
