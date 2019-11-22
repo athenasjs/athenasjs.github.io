@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="renderer" content="webkit">
+
+  
+  <title>Spring AOP基础 | 孙建树的技术博客</title>
+
+  <link rel="shortcut icon" href="/images/favicon.jpg">
+  <link rel="alternate" href="/atom.xml" title="孙建树的技术博客">
+  <meta name="description" content="什么是AOP？AOP即面向切面编程，相比OOP–面向对象编程，由于面向对象中最基本的单位是类，实例，很自然我们会联想到AOP中最基本的单位是切面。Spring中关于AOP的定义: 1面向切面--Spring提供了面向切面编程的丰富支持，允许通过分离应用的业务逻辑与系统级服务（例如审计和事务管理）进行内聚性的开发。应用对象只实现它们应该做的--完成业务逻辑，仅此而已，它们并不负责其他的系统级关注点，">
+<meta name="keywords" content="Spring,AOP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring AOP基础">
+<meta property="og:url" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;2019&#x2F;11&#x2F;11&#x2F;Spring-AOP%E5%9F%BA%E7%A1%80&#x2F;index.html">
+<meta property="og:site_name" content="孙建树的技术博客">
+<meta property="og:description" content="什么是AOP？AOP即面向切面编程，相比OOP–面向对象编程，由于面向对象中最基本的单位是类，实例，很自然我们会联想到AOP中最基本的单位是切面。Spring中关于AOP的定义: 1面向切面--Spring提供了面向切面编程的丰富支持，允许通过分离应用的业务逻辑与系统级服务（例如审计和事务管理）进行内聚性的开发。应用对象只实现它们应该做的--完成业务逻辑，仅此而已，它们并不负责其他的系统级关注点，">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;1621e668fb77807c.jpg">
+<meta property="og:updated_time" content="2019-11-12T07:13:37.988Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;1621e668fb77807c.jpg">
+
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="theme-color" content="#9C27B0">
+  <meta name="description" content="">
+  <meta name="keywords" content=",Spring,AOP">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="孙建树的技术博客">
+  <meta name="msapplication-starturl" content="http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/">
+  <meta name="msapplication-navbutton-color" content="#9C27B0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="孙建树的技术博客">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="/images/favicon.jpg">
+
+  
+    <meta property="article:published_time" content="Mon Nov 11 2019 21:02:47 GMT+0800">
+    <meta property="article:modified_time" content="Tue Nov 12 2019 15:13:37 GMT+0800">
+  
+
+  
+    <link rel="canonical" href="http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/">
+  
+
+  <meta name="google-site-verification" content="fXjtlIfaDc_X-0P11rO3bEp1Nk4IKXphoJv0GqGZCco">
+  <meta name="baidu-site-verification" content="I3t1wfwZvd">
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create','UA-139531378-1','auto');ga('send','pageview');
+</script>
+  <script>
+  var _hmt = _hmt || [];
+  (function() {var hm = document.createElement('script');
+  hm.src = 'https://hm.baidu.com/hm.js?1054d51c0b66f1d168829173682c8159';
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+
+  <link rel="stylesheet" href="/css/mdui.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="mdui-appbar-with-toolbar mdui-drawer-body-left mdui-theme-primary-indigo mdui-theme-accent-pink">
+  <script>var a=localStorage.getItem("mdui-theme-layout-dark");if(a){document.getElementsByTagName("body")[0].className+=" mdui-theme-layout-dark"};</script>
+  <header id="header" class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide mdui-appbar-inset">
+  <div class="mdui-toolbar mdui-color-theme">
+    <a href="javascript:;" target="_blank" rel="noopener" class="mdui-btn mdui-btn-icon" mdui-drawer="{target: '#sidebar', swipe: true}"><i class="mdui-icon material-icons">menu</i></a>
+    <a href="/" class="mdui-typo-headline">孙建树的技术博客</a>
+    <div class="mdui-toolbar-spacer"></div>
+    <a href="javascript:;" target="_blank" rel="noopener" class="mdui-btn mdui-btn-icon" mdui-dialog="{target: '#search'}" mdui-tooltip="{content: '搜索'}"><i class="mdui-icon material-icons">search</i></a>
+    <a href="/atom.xml" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'RSS'}"><i class="mdui-icon material-icons">rss_feed</i></a>
+  </div>
+</header>
+<div class="mdui-dialog" id="search">
+  
+    <div class="search-form">
+      <input type="search" class="search-form-input" placeholder="请输入关键字">
+    </div>
+    <div class="search-result" data-resource="/search.xml"></div>
+  
+</div>
+  <aside id="sidebar" class="mdui-drawer mdui-drawer-full-height">
+  <div class="mdui-grid-tile">
+    <img src="/images/banner.jpg" style="height: 160px;">
+    <img src="/images/avatar.jpg" class="avatar-animation" style="position: absolute; top: 10%; left: 24px; width: 64px; height: 64px; border: 2px solid #fff; border-radius: 50%;">
+    <div class="mdui-grid-tile-actions">
+      <div class="mdui-grid-tile-text">
+        <div class="mdui-grid-tile-title">孙建树</div>
+        <div class="mdui-grid-tile-subtitle"><i class="mdui-icon material-icons">art_track</i>桃李不言，下自成蹊</div>
+      </div>
+      
+        <div class="mdui-grid-tile-buttons">
+          <a href="mailto:sjswhut@163.com" target="_blank" rel="noopener" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'sjswhut@163.com'}"><i class="mdui-icon material-icons">email</i></a>
+        </div>
+      
+    </div>
+  </div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    <a href="/" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-blue">home</i>
+      <div class="mdui-list-item-content">主页</div>
+    </a>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-deep-orange">inbox</i>
+        <div class="mdui-list-item-content">归档</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="mdui-ripple sidebar_archives-count">10</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-green">chrome_reader_mode</i>
+        <div class="mdui-list-item-content">分类</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/categories/Spring%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">Spring读书笔记<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/tomcat%E7%B1%BB/">tomcat类<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/">默认分类<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-brown">bookmark</i>
+        <div class="mdui-list-item-content">标签</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/tags/AOP/" rel="tag">AOP<span class="mdui-ripple sidebar_archives-count">3</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Spring/" rel="tag">Spring<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx/" rel="tag">nginx<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/spring/" rel="tag">spring<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springMVC/" rel="tag">springMVC<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/tomcat/" rel="tag">tomcat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/zookeeper/" rel="tag">zookeeper<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1/" rel="tag">数据库事务<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" rel="tag">网络基础<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3/" rel="tag">计算机网络相关<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <a href="/about" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-purple">person</i>
+      <div class="mdui-list-item-content">关于</div>
+    </a>
+  </div>
+
+  <div class="mdui-divider"></div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    
+      <a href="/tagcloud" class="mdui-list-item mdui-ripple">标签云</a>
+    
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <div class="mdui-list-item-content">友情链接</div>
+        <i class="mdui-list-item-icon mdui-icon material-icons">link</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+          <a href="https://github.com" target="_blank" class="mdui-list-item mdui-ripple mdui-p-l-2 mdui-text-color-theme-accent" style="justify-content: center;">Github</a>
+        
+        
+      </div>
+    </div>
+  </div>
+</aside>
+  <main id="main" class="mdui-m-t-5 fadeIn animated">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.css">
+  <style>#main article .mdui-card-content .center-block{display:block!important;margin-right:auto!important;margin-left:auto!important}</style>
+  <article class="mdui-card mdui-m-b-5">
+    <header class="mdui-card-media">
+      <img src="/images/random/material-15.png" style="max-height: 240px;">
+      <div class="mdui-card-media-covered">
+        <div class="mdui-card-primary">
+          <div class="mdui-card-primary-title">Spring AOP基础</div>
+          <div class="mdui-card-primary-subtitle"><i class="iconfont">&#xe697;</i> 2019-11-11 / <i class="iconfont">&#xe601;</i> 孙建树</div>
+        </div>
+      </div>
+      <div class="mdui-card-menu">
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#qrcode', align: 'right'}"><i class="mdui-icon material-icons">devices</i></button>
+          <ul class="mdui-menu" id="qrcode">
+            
+              <li class="mdui-menu-item"><a class="mdui-text-center mdui-ripple">发送到手机</a></li>
+            
+            <li class="mdui-menu-item" disabled>
+              
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAACz0lEQVR42u3awU7DMBAE0P7/T8MVCZHOrAMt9ssJVWni50qMdtePjyOvBzY2NjY2NjY2NvZbsh/x9fX+Hx/97c7kk+v1XD85WTM2Njb2Cewn//p/WNz1/dffat+78l1sbGzsc9h5aLVRV8TMZeAtrRkbGxsbOy4wZp/nUYeNjY2NfS87L0jyBtNKNGJjY2OfzJ41/e8Nvzbe/qiXho2Njf327Nmg97V/v2y+jY2Njf1m7PZKwiMf/c7Yw5VjY2Njb8rOl9KG2WxgkBcq+cAYGxsb+zR2HiHt4Z4WmfwwyRZgY2Njn8bOy48oNspNvN6a9u3Y2NjYJ7DbV84O9CThlAdVHpbY2NjY57CTYJgVCbOlz8YMT1aLjY2NvSm7PvgSH5Ss2/flSvKNwMbGxj6BnYdB3oTKi5Y88JaaUNjY2NibspMISaJr1vpJNn02xigqMGxsbOyN2C1+1sT/vQHzk+IHGxsbe1P2rNhI2kCzsUF+NLMeWmBjY2Nvzc5bNusxNmsStaMLbGxsbOz1cWy79HaovHT4EhsbG3sjdtv6T+7PI23lOXnJhI2NjX0COx+d3rW4WfjNxgzY2NjYe7PvGri2ByiTQmJlnICNjY19JnslNmbHaPJyZaW9hY2NjX0COx/Ntgdr2iBsB8nF5mJjY2NvzV5fynUoJuPYduvzVhc2Njb23uyVAzqzgW679PXBADY2NvY57PWBbnL/bNx7Q3BiY2Njb8rOA6Z9ZbI1xYGbdhiAjY2NfQy7vWalRdIwajc6+XmwsbGxT2C3o9O72kP10cl4y7CxsbHPZCehNft8hsmfc/N8GxsbG/ufs9uyYcZeObKz0qLCxsbGxp6VH3mJsn5PPRXBxsbGPp6dR9F1RM3em3yOjY2NfRq7CINgTDu72tZV8RxsbGzsrdntoHc2AGg3tL2exCo2Njb2puxzLmxsbGxsbGxsbOy3uT4BX5lJSy6AzOQAAAAASUVORK5CYII=">
+              
+            </li>
+          </ul>
+        
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#share_menu', align: 'right'}"><i class="mdui-icon material-icons">share</i></button>
+          <ul class="mdui-menu" id="share_menu">
+            <li class="mdui-menu-item">
+              <a href="http://service.weibo.com/share/share.php?appkey=&title=Spring AOP基础&url=http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/&pic=http://athenasjs.github.io/images/favicon.jpg&searchPic=false&style=simple" target="_blank" class="mdui-ripple">分享到微博</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://twitter.com/intent/tweet?text=Spring AOP基础&url=http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/&via=孙建树" target="_blank" class="mdui-ripple">分享到Twitter</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/" target="_blank" class="mdui-ripple">分享到Facebook</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://plus.google.com/share?url=http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/" target="_blank" class="mdui-ripple">分享到Google+</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/&title=Spring AOP基础" target="_blank" class="mdui-ripple">分享到LinkedIn</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="http://connect.qq.com/widget/shareqq/index.html?site=孙建树的技术博客&title=Spring AOP基础&summary=&pics=http://athenasjs.github.io/images/favicon.jpg&url=http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/" target="_blank" class="mdui-ripple">分享到QQ</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://telegram.me/share/url?url=http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/&text=Spring AOP基础" target="_blank" class="mdui-ripple">分享到Telegram</a>
+            </li>
+          </ul>
+        
+      </div>
+    </header>
+    <div class="mdui-card-content mdui-typo">
+      <h2 id="什么是AOP？"><a href="#什么是AOP？" class="headerlink" title="什么是AOP？"></a>什么是AOP？</h2><p>AOP即面向切面编程，相比OOP–面向对象编程，由于面向对象中最基本的单位是类，实例，很自然我们会联想到AOP中最基本的单位是切面。<br>Spring中关于AOP的定义:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">面向切面--Spring提供了面向切面编程的丰富支持，允许通过分离应用的业务逻辑与系统级服务（例如审计和事务管理）进行内聚性的开发。应用对象只实现它们应该做的--完成业务逻辑，仅此而已，它们并不负责其他的系统级关注点，例如日志或事务支持。</span><br></pre></td></tr></table></figure>
+<p>上面谈到，AOP可以分离系统的业务逻辑和系统服务（日志、安全等），原理是使用了代理模式，但关键是为什么要将这两种分离呢？或者说这样有什么好处？<br>特点：1. 降低模块之间的耦合度 2.使系统容易扩展 3. 更好的代码复用</p>
+<p>在日常的软件开发中，拿日志来说，一个系统软件的开发都是必须进行日志记录的，不然万一系统出现bug，你都不知道是哪里出了问题，举个小栗子，当开发一个登录功能，可能需要在用户登录前后进行权限校验并将校验信息（用户名、密码、请求登录时间、ip地址等）记录在日志文件中，当用户登录进来时，访问某个其他功能时也需要进行合法性校验。想想看，当系统非常庞大，系统中专门进行权限验证的代码是非常多的，而且非常散乱，我们就思考能不能将这些权限校验、日志记录等非业务逻辑功能的部分独立拆开，并且在系统运行时需要的地方（连接点）动态插入运行，不需要的时候就不理，因此AOP是能解决这种问题的思想。</p>
+<p>下图直观展示这个过程：</p>
+<center> <img src="/images/1621e668fb77807c.jpg" width = 60% height = 60% /></center> 
+
+<h2 id="AOP中的基本概念"><a href="#AOP中的基本概念" class="headerlink" title="AOP中的基本概念"></a>AOP中的基本概念</h2><ul>
+<li>通知（Advice）：切面对于某个连接点所产生的动作<br>通知有5种类型：</li>
+</ul>
+<ol>
+<li>Before 在方法被调用之前调用，不能阻止连接点的执行。</li>
+<li>After 在方法完成后调用通知，无论方法是否执行成功</li>
+<li>After-returning 在方法成功执行之后调用通知</li>
+<li>After-throwing 在方法抛出异常后调用通知</li>
+<li>Around 环绕通知，在被通知的方法调用之前和调用之后执行自定义的行为，类似于Web中Servlet规范中的Filter中doFilter方法，可以在方法的调用前后完成自定义行为，也可以选择不执行。</li>
+</ol>
+<ul>
+<li>切点 （Pointcut）<br>切点在Spring AOP中确实是对应系统中的方法，但是这个方法是定义在切面中的方法，一般和通知一起使用，一起组成了切面。切入点是匹配连接点的断言，在AOP中通知和一个切入点表达式关联。</li>
+<li>连接点(Join point)<br>比如：方法调用、方法执行、字段设置/获取、异常处理执行、类初始化、甚至是for循环中的某个点，理论上程序执行过程中的任何时间点都可以作为连接点，但是Spring AOP目前仅仅支持方法执行（method execution），也可以这样理解，连接点就是准备在系统中执行切点和切入通知的地方（一般是一个方法、一个字段）。程序执行过程中的某一行为。</li>
+<li>切面（Aspect）<br>切面是切点和通知的集合，一般单独作为一个类，通知和切点共同定义了关于切面的全部内容，定义了在何时何处完成功能。</li>
+<li>引入 （Introduction）<br>允许我们向现有的类添加新的方法或者属性</li>
+<li>织入（Weaving）<br>组装切面来创建一个被通知对象，这可以在编译时完成（例如使用AspectJ编译器），也可以在运行时完成。Spring和其他纯Java AOP框架一样，在运行时完成织入。</li>
+<li>目标对象(Target Object) 被一个或多个切面所通知的对象  </li>
+</ul>
+<h2 id="Spring中对AOP的支持"><a href="#Spring中对AOP的支持" class="headerlink" title="Spring中对AOP的支持"></a>Spring中对AOP的支持</h2><p>首先AOP思想的实现一般基于代理模式，在JAVA中一般采用JDK动态代理方法，但是JDK的动态代理只能代理接口，如果要代理类那就不行了，因此Spring AOP会做切换，因为Spring AOP同时支持CGLIB、ASPECTJ、JDK动态代理，当真实目标类有实现接口时，Spring AOP会默认采用JDK动态代理，否则采用CGLIB动态代理。<br>核心逻辑：如果配置文件中指定了proxy-target-class为true，则使用CGlib方式进行代理，如果没有指定或者为false，那么会先检测被代理类是否实现自己的接口，如果实现了，那么就采用JDK动态代理的方式。</p>
+<ul>
+<li>如果目标类实现了接口，Spring AOP会采用JDK动态代理来生成AOP代理类；</li>
+<li>如果目标类没有实现接口，Spring AOP会采用CGLIB生成AOP代理类，这个选择过程完全对开发者透明，开发者无需关心。</li>
+</ul>
+<h2 id="测试Demo"><a href="#测试Demo" class="headerlink" title="测试Demo"></a>测试Demo</h2><ul>
+<li>定义主题接口，这些接口方法可以成为我们的连接点<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> wokao666.club.aop.spring01;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Subject</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//登陆</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">()</span></span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//下载</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">()</span></span>;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>定义实现类，这是代理模式中真正的被代理人<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> wokao666.club.aop.spring02;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> wokao666.club.aop.spring01.Subject;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SubjectImpl</span> <span class="keyword">implements</span> <span class="title">Subject</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		</span><br><span class="line">		System.err.println(<span class="string">"借书中..."</span>);</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">download</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		</span><br><span class="line">		System.err.println(<span class="string">"下载中..."</span>);</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>定义切面 切面中有切点和通知<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> wokao666.club.aop.spring01;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.JoinPoint;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PermissionVerification</span> </span>&#123;</span><br><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">  * 权限校验</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> args 登陆参数</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">canLogin</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//做一些登陆校验</span></span><br><span class="line">		System.err.println(<span class="string">"我正在校验啦！！！！"</span>);</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 校验之后做一些处理（无论是否成功都做处理）</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> args 权限校验参数</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">saveMessage</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//做一些后置处理</span></span><br><span class="line">			System.err.println(<span class="string">"我正在处理啦！！！！"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>再看看SpringAOP.xml文件<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">    <span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/aop</span></span></span><br><span class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/aop/spring-aop-4.2.xsd"</span>&gt;</span></span><br><span class="line">        </span><br><span class="line">        <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"SubjectImpl1"</span> <span class="attr">class</span>=<span class="string">"wokao666.club.aop.spring02.SubjectImpl"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"SubjectImpl2"</span> <span class="attr">class</span>=<span class="string">"wokao666.club.aop.spring02.SubjectImpl"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"PermissionVerification"</span> <span class="attr">class</span>=<span class="string">"wokao666.club.aop.spring01.PermissionVerification"</span> /&gt;</span></span><br><span class="line">        </span><br><span class="line">        <span class="tag">&lt;<span class="name">aop:config</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 这是定义一个切面，切面是切点和通知的集合--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">aop:aspect</span> <span class="attr">id</span>=<span class="string">"do"</span> <span class="attr">ref</span>=<span class="string">"PermissionVerification"</span>&gt;</span></span><br><span class="line">            	<span class="comment">&lt;!-- 定义切点 ，后面是expression语言，表示包括该接口中定义的所有方法都会被执行--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">aop:pointcut</span> <span class="attr">id</span>=<span class="string">"point"</span> <span class="attr">expression</span>=<span class="string">"execution(* wokao666.club.aop.spring01.Subject.*(..))"</span> /&gt;</span></span><br><span class="line">                <span class="comment">&lt;!-- 定义通知 --&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">aop:before</span> <span class="attr">method</span>=<span class="string">"canLogin"</span> <span class="attr">pointcut-ref</span>=<span class="string">"point"</span> /&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">aop:after</span> <span class="attr">method</span>=<span class="string">"saveMessage"</span> <span class="attr">pointcut-ref</span>=<span class="string">"point"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">aop:aspect</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">aop:config</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li>最后看看测试类和结果<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> wokao666.club.aop.spring01;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		ApplicationContext ctx = </span><br><span class="line">	      <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"SpringAOP.xml"</span>);</span><br><span class="line">	  </span><br><span class="line">				Subject subject1 = (Subject)ctx.getBean(<span class="string">"SubjectImpl1"</span>);</span><br><span class="line">				Subject subject2 = (Subject)ctx.getBean(<span class="string">"SubjectImpl2"</span>);</span><br><span class="line">				</span><br><span class="line">				subject1.login();</span><br><span class="line">				subject1.download();</span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line">				System.err.println(<span class="string">"=================="</span>);</span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line">				subject1.login();</span><br><span class="line">				subject1.download();</span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">我正在校验啦！！！！</span><br><span class="line">借书中...</span><br><span class="line">我正在处理啦！！！！</span><br><span class="line">我正在校验啦！！！！</span><br><span class="line">下载中...</span><br><span class="line">我正在处理啦！！！！</span><br><span class="line">==================</span><br><span class="line">我正在校验啦！！！！</span><br><span class="line">借书中...</span><br><span class="line">我正在处理啦！！！！</span><br><span class="line">我正在校验啦！！！！</span><br><span class="line">下载中...</span><br><span class="line">我正在处理啦！！！！</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      <blockquote class="mdui-m-t-5">
+        
+          <strong>本文遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</strong><br>
+        
+        <strong>本文链接：</strong><a href="http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/">http://athenasjs.github.io/2019/11/11/Spring-AOP%E5%9F%BA%E7%A1%80/</a>
+      </blockquote>
+      
+    </div>
+    <footer class="mdui-card-actions">
+      
+        <a class="mdui-ripple article_categories-link" href="/categories/Spring%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">Spring读书笔记</a>
+      
+      
+        <a class="mdui-ripple article_tags-link" href="/tags/AOP/" rel="tag">AOP</a><a class="mdui-ripple article_tags-link" href="/tags/Spring/" rel="tag">Spring</a>
+      
+    </footer>
+    
+  </article>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+  <script>$("#main article .mdui-card-content img.fancybox").on("click",function(e){$.fancybox.open({src:$(this).attr("src")});});</script>
+
+
+  <nav id="paginator">
+    
+      <a rel="prev" class="extend prev" href="/2019/11/12/Spring-AOP%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86-2/">
+        <button aria-label="prev" class="mdui-btn mdui-btn-raised mdui-btn-dense mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_back</i></button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;上一篇
+      </a>
+    
+    <div class="spacer"></div>
+    
+      <a rel="next" class="extend next" href="/2019/11/11/Spring-AOP%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86-1/">
+        下一篇&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button aria-label="next" class="mdui-btn mdui-btn-raised mdui-btn-dense mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_forward</i></button>
+      </a>
+    
+  </nav>
+
+
+
+</main>
+  <footer id="footer" class="mdui-m-t-5 mdui-p-y-3 mdui-color-theme">
+  <div class="mdui-p-y-0 mdui-text-center">
+    
+    
+    
+    
+    
+    
+    
+      <a href="https://github.com/athenasjs" target="_blank"><i class="mdui-p-a-1 mdui-icon iconfont mdui-text-color-theme-a100">&#xe7ab;</i></a>
+    
+    
+    
+      <a href="https://www.zhihu.com/people/sun-jian-shu-24/activities" target="_blank"><i class="mdui-p-a-1 mdui-icon iconfont mdui-text-color-theme-a100">&#xe6c0;</i></a>
+    
+    
+    
+    
+  </div>
+  <div class="mdui-p-y-1 mdui-text-center">
+    Copyright &copy; 2019 - 2019 孙建树<br>
+    Powered by <a href="https://hexo.io/" target="_blank" class="mdui-text-color-theme-accent">Hexo</a>
+    
+  </div>
+</footer>
+  <button id="gotop" class="mdui-fab mdui-fab-fixed mdui-fab-hide mdui-ripple mdui-color-theme-accent"><i class="mdui-icon material-icons">arrow_upward</i></button>
+  
+  <script src="/js/mdui.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>

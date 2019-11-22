@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="renderer" content="webkit">
+
+  
+  <title>Spring事务管理详解 | 孙建树的技术博客</title>
+
+  <link rel="shortcut icon" href="/images/favicon.jpg">
+  <link rel="alternate" href="/atom.xml" title="孙建树的技术博客">
+  <meta name="description" content="事务概念回顾什么是事务？事务是逻辑上的一组操作，要么都执行，要么都不执行。对局部数据库事务来说，一个事务处理的操作单元往往对应着一系列的数据库操作，数据库产品对这些数据库的SQL操作已经提供了原子性的支持，对SQL操作而言，它的操作结果有两种：一种是提交成功，数据库操作成功;另一种是回滚，数据库操作不成功，恢复到操作以前的状态。 事务的特性（ACID） 原子性：事务是最小的执行单位，不允许分割，事">
+<meta name="keywords" content="Spring,数据库事务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring事务管理详解">
+<meta property="og:url" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;2019&#x2F;11&#x2F;13&#x2F;Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3&#x2F;index.html">
+<meta property="og:site_name" content="孙建树的技术博客">
+<meta property="og:description" content="事务概念回顾什么是事务？事务是逻辑上的一组操作，要么都执行，要么都不执行。对局部数据库事务来说，一个事务处理的操作单元往往对应着一系列的数据库操作，数据库产品对这些数据库的SQL操作已经提供了原子性的支持，对SQL操作而言，它的操作结果有两种：一种是提交成功，数据库操作成功;另一种是回滚，数据库操作不成功，恢复到操作以前的状态。 事务的特性（ACID） 原子性：事务是最小的执行单位，不允许分割，事">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;1637b21877cf626d.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;1637b43a47916b2d.jpg">
+<meta property="og:updated_time" content="2019-11-13T10:44:28.998Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;athenasjs.github.io&#x2F;images&#x2F;1637b21877cf626d.jpg">
+
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="theme-color" content="#9C27B0">
+  <meta name="description" content="">
+  <meta name="keywords" content=",Spring,数据库事务">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="孙建树的技术博客">
+  <meta name="msapplication-starturl" content="http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/">
+  <meta name="msapplication-navbutton-color" content="#9C27B0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="孙建树的技术博客">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="/images/favicon.jpg">
+
+  
+    <meta property="article:published_time" content="Wed Nov 13 2019 16:32:16 GMT+0800">
+    <meta property="article:modified_time" content="Wed Nov 13 2019 18:44:28 GMT+0800">
+  
+
+  
+    <link rel="canonical" href="http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/">
+  
+
+  <meta name="google-site-verification" content="fXjtlIfaDc_X-0P11rO3bEp1Nk4IKXphoJv0GqGZCco">
+  <meta name="baidu-site-verification" content="I3t1wfwZvd">
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create','UA-139531378-1','auto');ga('send','pageview');
+</script>
+  <script>
+  var _hmt = _hmt || [];
+  (function() {var hm = document.createElement('script');
+  hm.src = 'https://hm.baidu.com/hm.js?1054d51c0b66f1d168829173682c8159';
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+
+  <link rel="stylesheet" href="/css/mdui.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="mdui-appbar-with-toolbar mdui-drawer-body-left mdui-theme-primary-indigo mdui-theme-accent-pink">
+  <script>var a=localStorage.getItem("mdui-theme-layout-dark");if(a){document.getElementsByTagName("body")[0].className+=" mdui-theme-layout-dark"};</script>
+  <header id="header" class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide mdui-appbar-inset">
+  <div class="mdui-toolbar mdui-color-theme">
+    <a href="javascript:;" target="_blank" rel="noopener" class="mdui-btn mdui-btn-icon" mdui-drawer="{target: '#sidebar', swipe: true}"><i class="mdui-icon material-icons">menu</i></a>
+    <a href="/" class="mdui-typo-headline">孙建树的技术博客</a>
+    <div class="mdui-toolbar-spacer"></div>
+    <a href="javascript:;" target="_blank" rel="noopener" class="mdui-btn mdui-btn-icon" mdui-dialog="{target: '#search'}" mdui-tooltip="{content: '搜索'}"><i class="mdui-icon material-icons">search</i></a>
+    <a href="/atom.xml" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'RSS'}"><i class="mdui-icon material-icons">rss_feed</i></a>
+  </div>
+</header>
+<div class="mdui-dialog" id="search">
+  
+    <div class="search-form">
+      <input type="search" class="search-form-input" placeholder="请输入关键字">
+    </div>
+    <div class="search-result" data-resource="/search.xml"></div>
+  
+</div>
+  <aside id="sidebar" class="mdui-drawer mdui-drawer-full-height">
+  <div class="mdui-grid-tile">
+    <img src="/images/banner.jpg" style="height: 160px;">
+    <img src="/images/avatar.jpg" class="avatar-animation" style="position: absolute; top: 10%; left: 24px; width: 64px; height: 64px; border: 2px solid #fff; border-radius: 50%;">
+    <div class="mdui-grid-tile-actions">
+      <div class="mdui-grid-tile-text">
+        <div class="mdui-grid-tile-title">孙建树</div>
+        <div class="mdui-grid-tile-subtitle"><i class="mdui-icon material-icons">art_track</i>桃李不言，下自成蹊</div>
+      </div>
+      
+        <div class="mdui-grid-tile-buttons">
+          <a href="mailto:sjswhut@163.com" target="_blank" rel="noopener" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'sjswhut@163.com'}"><i class="mdui-icon material-icons">email</i></a>
+        </div>
+      
+    </div>
+  </div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    <a href="/" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-blue">home</i>
+      <div class="mdui-list-item-content">主页</div>
+    </a>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-deep-orange">inbox</i>
+        <div class="mdui-list-item-content">归档</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="mdui-ripple sidebar_archives-count">10</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-green">chrome_reader_mode</i>
+        <div class="mdui-list-item-content">分类</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/categories/Spring%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">Spring读书笔记<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/tomcat%E7%B1%BB/">tomcat类<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/">默认分类<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-brown">bookmark</i>
+        <div class="mdui-list-item-content">标签</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/tags/AOP/" rel="tag">AOP<span class="mdui-ripple sidebar_archives-count">3</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Spring/" rel="tag">Spring<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx/" rel="tag">nginx<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/spring/" rel="tag">spring<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springMVC/" rel="tag">springMVC<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/tomcat/" rel="tag">tomcat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/zookeeper/" rel="tag">zookeeper<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1/" rel="tag">数据库事务<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" rel="tag">网络基础<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3/" rel="tag">计算机网络相关<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <a href="/about" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-purple">person</i>
+      <div class="mdui-list-item-content">关于</div>
+    </a>
+  </div>
+
+  <div class="mdui-divider"></div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    
+      <a href="/tagcloud" class="mdui-list-item mdui-ripple">标签云</a>
+    
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <div class="mdui-list-item-content">友情链接</div>
+        <i class="mdui-list-item-icon mdui-icon material-icons">link</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+          <a href="https://github.com" target="_blank" class="mdui-list-item mdui-ripple mdui-p-l-2 mdui-text-color-theme-accent" style="justify-content: center;">Github</a>
+        
+        
+      </div>
+    </div>
+  </div>
+</aside>
+  <main id="main" class="mdui-m-t-5 fadeIn animated">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.css">
+  <style>#main article .mdui-card-content .center-block{display:block!important;margin-right:auto!important;margin-left:auto!important}</style>
+  <article class="mdui-card mdui-m-b-5">
+    <header class="mdui-card-media">
+      <img src="/images/random/material-17.png" style="max-height: 240px;">
+      <div class="mdui-card-media-covered">
+        <div class="mdui-card-primary">
+          <div class="mdui-card-primary-title">Spring事务管理详解</div>
+          <div class="mdui-card-primary-subtitle"><i class="iconfont">&#xe697;</i> 2019-11-13 / <i class="iconfont">&#xe601;</i> 孙建树</div>
+        </div>
+      </div>
+      <div class="mdui-card-menu">
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#qrcode', align: 'right'}"><i class="mdui-icon material-icons">devices</i></button>
+          <ul class="mdui-menu" id="qrcode">
+            
+              <li class="mdui-menu-item"><a class="mdui-text-center mdui-ripple">发送到手机</a></li>
+            
+            <li class="mdui-menu-item" disabled>
+              
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQ4AAAEOCAAAAABd2qZ5AAADmklEQVR42u3aO3LcMBAFwL3/peXUVTa57w0AikEjUkkrEOgNhvP5/Fh/rQ8CHDhw4MCBAwcOHDhezPGJ19Xnr3b7z4P/2efqv5Kn3++T3AUHDhw4cJzj+BKKbh9/tU8OmrDeQ8zuggMHDhw4TnPcXyA/REtzdeg83M7uggMHDhw43sDRJksr6dx6iogDBw4cON7PkRzlPn1KwmQeeltWHDhw4MDxJEdeUGvLf3lQTEJ7ErAfqpXiwIEDB45NAw1v/vkX5jtw4MCBA8fyaptAs+JjG/iHd8GBAwcOHFs51ltK7VhbftW9qV3x3oEDBw4cODZxzBK2BHfWdmrHGtqiJA4cOHDgOMGRB7x26CEfeksaVzllEp5x4MCBA8eTHHnZLglss7GD++GJdrTiS3jGgQMHDhxbOfLHJJ9PDtemXrN98pYVDhw4cODYy5EHvzzRSgqIecLWliPrlwAcOHDgwHGYoy3G5YMFbXNoJW0rxvJw4MCBA8dWjpWxtvULtwnY+isCDhw4cOA4zZGX59qwmuxzf4ZdidwXLBw4cODAsZUjbxHt/esusja1w4EDBw4cpznWG0htyFwJlrvaWjhw4MCB4zTHrtLberBcaV+1QxI4cODAgeM0RzsckLSL2oQtT+pmSWOUwuHAgQMHjk0cs5Sp3Wcl5Vv5DA4cOHDgeIYj3/o+vM32mV17luDhwIEDB45nOPKkKLlYkobtGqFrC5TFQAMOHDhw4FjgWBl6S9pUbWNp9vsooCZtJxw4cODAsYkjH2X4lCtpTeVPbBtRUZjHgQMHDhxbOWYNp7Z4t56MrTechqNyOHDgwIGj5FhJz9rCXx5KT7wKFF04HDhw4MCxiWN2jZ9gzVpNK42o/IQ4cODAgeMEx30itKtBNSzeBYlZHrZx4MCBA8fzHPlVV4YSWqzZaEVUjsSBAwcOHMc4dgXO9c9EqVf8hdXzHThw4MCB4wBH2xBqhwnaNOwzWtEdceDAgQPHVo52tSlfTtNeox1riIqDOHDgwIFjmWMWtNpH5mlYe7H8bJf748CBAweOAxyzQycDcLvStraMmJwNBw4cOHCc5pgF13b0YSW0zwqFX75sHDhw4MDxSo4koM7KgvkwxPBVAAcOHDhw/CrHLFgm/9umXu0tcODAgQPH8xzJw2btotmQxK4Q+4UbBw4cOHAc4GhLdfnD2gvXpb0S8ch8Bw4cOHDgsHDgwIEDBw4cOHDgwPHe9QeMOBDxhKbRVAAAAABJRU5ErkJggg==">
+              
+            </li>
+          </ul>
+        
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#share_menu', align: 'right'}"><i class="mdui-icon material-icons">share</i></button>
+          <ul class="mdui-menu" id="share_menu">
+            <li class="mdui-menu-item">
+              <a href="http://service.weibo.com/share/share.php?appkey=&title=Spring事务管理详解&url=http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/&pic=http://athenasjs.github.io/images/favicon.jpg&searchPic=false&style=simple" target="_blank" class="mdui-ripple">分享到微博</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://twitter.com/intent/tweet?text=Spring事务管理详解&url=http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/&via=孙建树" target="_blank" class="mdui-ripple">分享到Twitter</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/" target="_blank" class="mdui-ripple">分享到Facebook</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://plus.google.com/share?url=http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/" target="_blank" class="mdui-ripple">分享到Google+</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/&title=Spring事务管理详解" target="_blank" class="mdui-ripple">分享到LinkedIn</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="http://connect.qq.com/widget/shareqq/index.html?site=孙建树的技术博客&title=Spring事务管理详解&summary=&pics=http://athenasjs.github.io/images/favicon.jpg&url=http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/" target="_blank" class="mdui-ripple">分享到QQ</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://telegram.me/share/url?url=http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/&text=Spring事务管理详解" target="_blank" class="mdui-ripple">分享到Telegram</a>
+            </li>
+          </ul>
+        
+      </div>
+    </header>
+    <div class="mdui-card-content mdui-typo">
+      <h3 id="事务概念回顾"><a href="#事务概念回顾" class="headerlink" title="事务概念回顾"></a>事务概念回顾</h3><h4 id="什么是事务？"><a href="#什么是事务？" class="headerlink" title="什么是事务？"></a>什么是事务？</h4><p>事务是逻辑上的一组操作，要么都执行，要么都不执行。对局部数据库事务来说，一个事务处理的操作单元往往对应着一系列的数据库操作，数据库产品对这些数据库的SQL操作已经提供了原子性的支持，对SQL操作而言，它的操作结果有两种：一种是提交成功，数据库操作成功;另一种是回滚，数据库操作不成功，恢复到操作以前的状态。</p>
+<h4 id="事务的特性（ACID）"><a href="#事务的特性（ACID）" class="headerlink" title="事务的特性（ACID）"></a>事务的特性（ACID）</h4><ol>
+<li>原子性：事务是最小的执行单位，不允许分割，事务的原子性确保动作要么全部完成，要么完全不起作用。</li>
+<li>一致性：执行事务前后，数据保持一致；</li>
+<li>隔离性：并发访问数据库时，一个用户的事务不被其他事务所干扰，各并发事务之间是独立的。</li>
+<li>持久性：一个事务被提交后，它对数据库中数据的改变是持久的，即使数据库发生故障也不应该对其有任何影响。</li>
+</ol>
+<h3 id="Spring事务管理接口介绍"><a href="#Spring事务管理接口介绍" class="headerlink" title="Spring事务管理接口介绍"></a>Spring事务管理接口介绍</h3><h4 id="Spring事务管理接口："><a href="#Spring事务管理接口：" class="headerlink" title="Spring事务管理接口："></a>Spring事务管理接口：</h4><ul>
+<li>PlatformTransactionManager: 事务管理器</li>
+<li>TransactionDefinition: 事务定义信息（事务隔离级别、传播行为、超时、只读、回滚规则）</li>
+<li>TransactionStatus: 事务运行状态<br>所谓事务管理，其实就是按照给定的事务规则来执行提交或者回滚。<h4 id="PlatformTransactionManager接口介绍"><a href="#PlatformTransactionManager接口介绍" class="headerlink" title="PlatformTransactionManager接口介绍"></a>PlatformTransactionManager接口介绍</h4>Spring并不直接管理事务，而是提供了多种事务管理器，他们将事务管理的职责委托给Hibernate或者JTA等持久化机制所提供的相关平台框架的事务来实现。通过PlatformTransactionManager这个接口,Spring为各个平台如JDBC、Hibernate等都提供了对应的事务管理器，但是具体的实现就是各个平台自己的事情了。<br>PlatformTransactionManager接口代码如下：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Public interface <span class="title">PlatformTransactionManager</span><span class="params">()</span>...</span>&#123;  </span><br><span class="line">    <span class="comment">// Return a currently active transaction or create a new one, according to the specified propagation behavior（根据指定的传播行为，返回当前活动的事务或创建一个新事务。）</span></span><br><span class="line">    <span class="function">TransactionStatus <span class="title">getTransaction</span><span class="params">(TransactionDefinition definition)</span> <span class="keyword">throws</span> TransactionException</span>; </span><br><span class="line">    <span class="comment">// Commit the given transaction, with regard to its status（使用事务目前的状态提交事务）</span></span><br><span class="line">    <span class="function">Void <span class="title">commit</span><span class="params">(TransactionStatus status)</span> <span class="keyword">throws</span> TransactionException</span>;  </span><br><span class="line">    <span class="comment">// Perform a rollback of the given transaction（对执行的事务进行回滚）</span></span><br><span class="line">    <span class="function">Void <span class="title">rollback</span><span class="params">(TransactionStatus status)</span> <span class="keyword">throws</span> TransactionException</span>;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+Spring根据不同的持久层框架所对应的接口实现类几个比较常见的如下图所示：<center> <img src="/images/1637b21877cf626d.jpg" width = 60% height = 60% /></center>
+比如我们在使用JDBC或Mybatis进行数据持久化操作时，我们的xml配置通常如下：
+
+</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 事务管理器 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"transactionManager"</span></span></span><br><span class="line"><span class="tag">	<span class="attr">class</span>=<span class="string">"org.springframework.jdbc.datasource.DataSourceTransactionManager"</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 数据源 --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">ref</span>=<span class="string">"dataSource"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="TransactionDefinition接口介绍"><a href="#TransactionDefinition接口介绍" class="headerlink" title="TransactionDefinition接口介绍"></a>TransactionDefinition接口介绍</h4><p>事务管理器接口PlatformTransactionManager通过getTransaction方法来得到一个事务，这个方法里面的参数就是TransactionDefinition，这个类就定义了一些基本的事务属性。  </p>
+<p>事务属性可以理解成事务的一些基本配置，描述了事务策略如何应用到方法上，包含了5个方面。</p>
+<center> <img src="/images/1637b43a47916b2d.jpg" width = 60% height = 60% /></center>
+TransactionDefinition接口中定义了5个方法以及一些表示事务属性的常量比如隔离级别、传播行为等等的常量。
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">TransactionDefinition</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 返回事务的传播行为</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getPropagationBehavior</span><span class="params">()</span></span>; </span><br><span class="line">    <span class="comment">// 返回事务的隔离级别，事务管理器根据它来控制另外一个事务可以看到本事务内的哪些数据</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getIsolationLevel</span><span class="params">()</span></span>; </span><br><span class="line">    <span class="comment">// 返回事务必须在多少秒内完成</span></span><br><span class="line">    <span class="comment">//返回事务的名字</span></span><br><span class="line">    <span class="function">String <span class="title">getName</span><span class="params">()</span>；</span></span><br><span class="line"><span class="function">    <span class="keyword">int</span> <span class="title">getTimeout</span><span class="params">()</span></span>;  </span><br><span class="line">    <span class="comment">// 返回是否优化为只读事务。</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isReadOnly</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>(1) 事务的隔离级别 （定义了一个事务可能受其他并发事务影响的程度）</p>
+<h4 id="并发事务带来的问题"><a href="#并发事务带来的问题" class="headerlink" title="并发事务带来的问题"></a>并发事务带来的问题</h4><p>在典型的应用程序中，多个事务并发运行，经常会操作相同的数据来完成各自的任务（多个用户对同一数据进行操作），并发虽然是必须的，但是会导致以下问题。</p>
+<ul>
+<li>脏读  当一个事务正在访问数据并对数据进行了修改，而这种修改还没有提交，这时另外一个事务也访问了这个数据，然后使用了这个数据，因为这个数据还没有提交，那么另外一个事务读取到的是脏数据，所做的操作可能是不正确的。</li>
+<li>丢失修改（Lost to modify） 指的是在一个事务读取一个数据时，另外一个事务也访问了该数据，那么在第一个事务中修改了这个数据后，第二个事务也修改了这个数据，这样第一个事务内的修改结果就会丢失，因此称为丢失修改。<br>例如：事务1读取表中数据A=20,事务2也读取A=20，事务1修改A=A-1，事务2也修改A=A-1，最终结果A=19，事务1的修改被丢失。</li>
+<li>不可重复读： 指的是在一个事务内多次读取同一数据，在这个事务还没有结束时，另一个事务也访问该数据，那么在第一个事务的两次读取期间，由于第二个事务的修改导致第一个事务读取的数据不一致，这就发生了在一个事务内两次读取数据不一致的情况，因此成为不可重复读。</li>
+<li>幻读：与不可重复读类似，它发生在一个事务(T1)读取了几行数据，接着另一个并发事务插入了一些数据，在随后的查询中，第一个事务T1就会发现多了一些原本不存在的记录，就好像发生了幻觉一样，所以成为幻读。<h4 id="不可重复读和幻读区别"><a href="#不可重复读和幻读区别" class="headerlink" title="不可重复读和幻读区别"></a>不可重复读和幻读区别</h4>不可重复读的重点是修改，幻读的重点在于新增或者删除。<br>例1（同样的条件，你读取过的数据，再次读取出来发现值不一样了）：事务1中的A读取自己的工资为1000的操作还没完成，事务2中的B修改了A的工资为2000，导致A再度自己的工资为2000，这就是不可重复读。<br>例2（同样的条件，第一次和第二次读取出来的记录数不一样）：假设工资表中工资大于3000的有4人，事务1读取了所有工资大于3000的人，共查到4条记录，这时事务2又插入一条，事务1再次读取时查到的记录就多了一条导致幻读。<h4 id="隔离级别"><a href="#隔离级别" class="headerlink" title="隔离级别"></a>隔离级别</h4>TransactionDefinition接口中定义了五个表示隔离级别的常量:</li>
+<li>TransactionDefinition.ISOLATION_DEFAULT 使用后端数据库默认的隔离级别，Mysql默认采用REPEATABLE_READ，Oracle采用READ_COMMITTED</li>
+<li>TransactionDefinition.ISOLATION_READ_UNCOMMITTED 最低的隔离级别，允许读取尚未提交的数据变更，可能导致脏读、不可重复读和幻读</li>
+<li>TransactionDefinition.ISOLATION_READ_COMMITTED 允许读取并发事务已经提交的数据，可以避免脏读，但是幻读或不可重复读仍然有可能发生</li>
+<li>TransactionDefinition.ISOLATION_REPEATABLE_READ 对同一字段的多次读取结果一致，除非数据被本身事务自己修改，可以避免脏读和不可重复读，但是幻读还是会出现。</li>
+<li>TransactionDefinition.ISOLATION_SERIALIZABLE 最高的隔离级别，完全服从ACID的隔离级别，所有的事务依次逐个执行，这样事务之间完全不可能产生干扰，也就是说该级别可以防止脏读、不可重复读以及幻读。但是严重影响程序性能。<br>(2) 事务传播行为 （解决业务层方法之间相互调用的事务问题）<br>当事务方法被另一个事务方法调用时，必须指定事务该如何传播，例如：方法有可能继续在现有事务中运行，也可能开启一个新事务，并在自己的事务中运行。<h5 id="支持当前事务的情况"><a href="#支持当前事务的情况" class="headerlink" title="支持当前事务的情况"></a>支持当前事务的情况</h5></li>
+<li>TransactionDefinition.PROPAGATION_REQUIRED 如果存在当前事务，则加入该事务，如果当前没有事务，则创建一个新事务</li>
+<li>TransactionDefinition.PROPAGATION_SUPPORTS 如果存在当前事务，则加入该事务；否则以非事务的方式继续运行</li>
+<li>TransactionDefinition.PROPAGATION_MANDATORY 如果存在当前事务，则加入该事务；如果没有当前事务，则抛出异常<h5 id="不支持当前事务的情况"><a href="#不支持当前事务的情况" class="headerlink" title="不支持当前事务的情况"></a>不支持当前事务的情况</h5></li>
+<li>TransactionDefinition.PROPAGATION_REQUIRES_NEW 创建一个新的事务，如果当前存在事务，则挂起当前事务</li>
+<li>TransactionDefinition.PROPAGATION_NOT_SUPPORTED 以非事务方式运行，如果当前存在事务，则把当前事务挂起</li>
+<li>TransactionDefinition.PROPAGATION_NEVER  以非事务方式运行，如果当前存在事务，则抛出异常。<h5 id="其他情况"><a href="#其他情况" class="headerlink" title="其他情况"></a>其他情况</h5></li>
+<li>TransactionDefinition.PROPAGATION_NESTED 如果当前存在事务，则创建一个嵌套事务来运行，如果当前没有事务，则等价于TransactionDefinition.PROPAGATION_REQUIRED  </li>
+</ul>
+<p>前面的六种事务传播行为是Spring 从EJB中引入的，它们共享相同的概念，而NESTED是Spring特有的，内嵌事务不是一个单独的事务，依赖于外部事务的存在，只有通过外部事务的提交才能引起内部事务的提交，嵌套的事务不能单独提交。如果熟悉JDBC中保存点savepoint的概念，那嵌套事务就很容易理解，嵌套事务就是保存点的一个应用，一个事务中可以包括多个保存点。外部事务的回滚也会导致嵌套事务的回滚。嵌套事务开始执行时，它将取得一个savepoint，如果这个嵌套事务失败 ，我们将回滚到此savepoint。</p>
+<p>(3) 事务超时属性（一个事务允许执行的最长时间）  </p>
+<p>所谓事务超时，就是指的是一个事务允许执行的最长时间，如果超过该时间限制还没有完成，则自动回滚。  </p>
+<p>(4) 事务只读属性 （对事务资源是否执行只读操作）  </p>
+<p>事务的只读属性是指对事务性资源进行只读操作或者读写操作，所谓事务性资源是指那些被事务管理的资源，比如数据源、JMS资源等，如果确定对事务性资源进行只读操作，那么我们可以将事务标志为只读的，提高事务处理的性能。  </p>
+<p>(5) 回滚规则 （定义事务回滚规则）  </p>
+<p>这些规则定义了哪些异常会导致事务回滚而哪些不会，默认情况下事务只有遇到运行期异常才会回滚，而遇到检查性异常时不会回滚，但是可以声明事务在遇到特定的检查型异常时像遇到运行期异常那样回滚。同样，还可以声明事务遇到特定的异常不回滚，即使这些异常是运行期异常。</p>
+<h4 id="TransactionStatus接口介绍"><a href="#TransactionStatus接口介绍" class="headerlink" title="TransactionStatus接口介绍"></a>TransactionStatus接口介绍</h4><p>TransactionStatus接口用来记录事务的状态，该接口定义了一组方法，用来获取或判断事务的相应状况<br>PlatformTransactionManager.getTransaction()方法返回一个TransactionStatus对象，可能代表一个新的或已经存在的事务。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">TransactionStatus</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isNewTransaction</span><span class="params">()</span></span>; <span class="comment">// 是否是新的事物</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">hasSavepoint</span><span class="params">()</span></span>; <span class="comment">// 是否有恢复点</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setRollbackOnly</span><span class="params">()</span></span>;  <span class="comment">// 设置为只回滚</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isRollbackOnly</span><span class="params">()</span></span>; <span class="comment">// 是否为只回滚</span></span><br><span class="line">    <span class="keyword">boolean</span> isCompleted; <span class="comment">// 是否已完成</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Spring事务处理底层实现"><a href="#Spring事务处理底层实现" class="headerlink" title="Spring事务处理底层实现"></a>Spring事务处理底层实现</h3><p>Spring事务处理模块是通过AOP功能来实现声明式事务处理的，在代理对象中通过TransactionInterceptor来完成对代理方法的拦截，正是这些AOP的拦截功能，将事务处理的功能编织进来。</p>
+<h4 id="代理类生成"><a href="#代理类生成" class="headerlink" title="代理类生成"></a>代理类生成</h4><p>为类创建代理的入口位于AbstractAutoProxyCreator.postProcessAfterInitialization，getAdvicesAndAdvisorsForBean用于去容器中寻找合适当前bean的Advisor，对于Spring事务来说有唯一的Advisor:BeanFactoryTransactionAttributeSourceAdvisor。</p>
+<h4 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h4><p>调用链生成：getInterceptorsAndDynamicInterceptionAdvice方法，原理是遍历所有使用的Advisor，获得其Advice，将其适配为MethodInterceptor，AdvisorAdaptor接口用以支持用户自定义的Advice类型，将自定义类型转换为拦截器。默认adapters含有MethodBeforeAdviceAdapter、AfterReturningAdviceAdapter、ThrowsAdviceAdapter三种类型，分别支持MethodBeforeAdvice、AfterReturningAdvice和ThrowsAdvice。<br>对于Spring事务管理来说，只有一个拦截器TransactionInterceptor。  </p>
+<p>调用链调用： ReflectiveMethodInvocation.proceed(),这其实是一个逐个调用拦截器的invoke方法，最终调用原本方法（被代理方法）的过程，事务添加的核心逻辑在TransactionInterceptor的invoke方法，确定事务管理器，在逻辑执行前开启事务，Spring事务的开启实际上是将数据库的自动提交设为false，事务的提交和回滚也是对jdbc相应方法的封装。<br>总结： 事务的本质其实是对数据库自动提交的关闭和开启，传播特性是Spring提出、实现、控制的概念，而隔离级别是对数据库实现的封装。</p>
+
+      <blockquote class="mdui-m-t-5">
+        
+          <strong>本文遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</strong><br>
+        
+        <strong>本文链接：</strong><a href="http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/">http://athenasjs.github.io/2019/11/13/Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E8%AF%A6%E8%A7%A3/</a>
+      </blockquote>
+      
+    </div>
+    <footer class="mdui-card-actions">
+      
+        <a class="mdui-ripple article_categories-link" href="/categories/Spring%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">Spring读书笔记</a>
+      
+      
+        <a class="mdui-ripple article_tags-link" href="/tags/Spring/" rel="tag">Spring</a><a class="mdui-ripple article_tags-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1/" rel="tag">数据库事务</a>
+      
+    </footer>
+    
+  </article>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+  <script>$("#main article .mdui-card-content img.fancybox").on("click",function(e){$.fancybox.open({src:$(this).attr("src")});});</script>
+
+
+  <nav id="paginator">
+    
+    <div class="spacer"></div>
+    
+      <a rel="next" class="extend next" href="/2019/11/12/Spring-AOP%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86-3/">
+        下一篇&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button aria-label="next" class="mdui-btn mdui-btn-raised mdui-btn-dense mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_forward</i></button>
+      </a>
+    
+  </nav>
+
+
+
+</main>
+  <footer id="footer" class="mdui-m-t-5 mdui-p-y-3 mdui-color-theme">
+  <div class="mdui-p-y-0 mdui-text-center">
+    
+    
+    
+    
+    
+    
+    
+      <a href="https://github.com/athenasjs" target="_blank"><i class="mdui-p-a-1 mdui-icon iconfont mdui-text-color-theme-a100">&#xe7ab;</i></a>
+    
+    
+    
+      <a href="https://www.zhihu.com/people/sun-jian-shu-24/activities" target="_blank"><i class="mdui-p-a-1 mdui-icon iconfont mdui-text-color-theme-a100">&#xe6c0;</i></a>
+    
+    
+    
+    
+  </div>
+  <div class="mdui-p-y-1 mdui-text-center">
+    Copyright &copy; 2019 - 2019 孙建树<br>
+    Powered by <a href="https://hexo.io/" target="_blank" class="mdui-text-color-theme-accent">Hexo</a>
+    
+  </div>
+</footer>
+  <button id="gotop" class="mdui-fab mdui-fab-fixed mdui-fab-hide mdui-ripple mdui-color-theme-accent"><i class="mdui-icon material-icons">arrow_upward</i></button>
+  
+  <script src="/js/mdui.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>
